@@ -1,48 +1,70 @@
-operators=['+','-','*','/','**','(',')']
+def new_split_iter(expr):
+	"""divide a character string into individual tokens, which need not be separated by spaces (but can be!)
+	also, the results are returned in a manner similar to iterator instead of a new data structure
+	"""
+	expr = expr + ";"  # append new symbol to mark end of data, for simplicity
+	pos = 0  # begin at first character position in the list
+	operator_taken = True
 
-def get_item(str):
-	out=""
-	non_blank_started=False
-	is_number=False
-	for i in range(0,len(str)):
-		if is_num(str[i]):
-			if non_blank_started and not is_number:
-				return out, i
+	while expr[pos] != ";":  # repeat until the end of the input is found
+		token = expr[pos]
+
+		# Handle + - / and (
+		if expr[pos + 1] == "=" and token in "<>!=":
+			operator_taken = True
+			yield token + expr[pos + 1]
+		elif token in "+/(":
+			operator_taken = True
+			yield token
+		# Handle "-" operator
+		elif token == "-" and not operator_taken:
+			operator_taken = True
+			yield token
+		# Handle "-" sign
+		elif token == "-" and operator_taken:
+			number = token
+			allow_blank = True
+			for i in range(pos + 1, len(expr)):
+				if expr[i].isnumeric() or expr[i]==".":
+					allow_blank = False
+					number += expr[i]
+				elif allow_blank:
+					continue
+				else:
+					pos += i - 1 - pos
+					break
+			operator_taken = False
+			yield number
+		# Handle )
+		elif token == ")":
+			operator_taken = False
+			yield token
+		# Handle * and **
+		elif token == "*":
+			operator_taken = True
+			if expr[pos + 1] == "*":
+				yield "**"
+				pos += 1
 			else:
-				non_blank_started=True
-				is_number=True
-				out+=str[i]
-		elif is_opt(str[i]):
-			if non_blank_started and is_number:
-				return out, i
-			else:
-				non_blank_started=True
-				is_number=False
-				out+=str[i]
-	return out, len(str)
+				yield token
+		# Handle number
+		elif token.isnumeric():
+			number = token
+			for i in range(pos + 1, len(expr)):
+				if expr[i].isnumeric() or expr[i]==".":
+					number += expr[i]
+				else:
+					pos += i - 1 - pos
+					break
+			operator_taken = False
+			yield number
+		# Handle other characters like blank space
+		else:
+			pass
+		pos += 1
+	yield ";"
 
-def new_split_iter(str):
-	while True:
-		a, i = get_item(str)
-		str.split(2)
 
-def is_num(expr):
-	if expr=='.':
-		return True
-	try:
-		a = int(expr)
-		return True
-	except:
-		return False
-
-def is_opt(expr):
-	for i in operators:
-		if i==expr:
-			return True
-	return False
-
-if __name__=="__main__":
-	a="1+3/4"
-	for i in new_split_iter(a):
-		print(i+",")
-	print("done")
+if __name__ == "__main__":
+	print(list(new_split_iter("3+   (4 * 5)")))
+	print(list(new_split_iter("3+5--2*2/(-6**   34.5<=5   != 10)--5")))
