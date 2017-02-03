@@ -4,67 +4,71 @@ def new_split_iter(expr):
 	"""
 	expr = expr + ";"  # append new symbol to mark end of data, for simplicity
 	pos = 0  # begin at first character position in the list
-	operator_taken = True
 
 	while expr[pos] != ";":  # repeat until the end of the input is found
 		token = expr[pos]
-
-		# Handle + - / and (
-		if expr[pos + 1] == "=" and token in "<>!=":
-			operator_taken = True
-			yield token + expr[pos + 1]
-		elif token in "+/(":
-			operator_taken = True
-			yield token
-		# Handle "-" operator
-		elif token == "-" and not operator_taken:
-			operator_taken = True
-			yield token
-		# Handle "-" sign
-		elif token == "-" and operator_taken:
-			number = token
-			allow_blank = True
-			for i in range(pos + 1, len(expr)):
-				if expr[i].isnumeric() or expr[i]==".":
-					allow_blank = False
-					number += expr[i]
-				elif allow_blank:
-					continue
+		out = ""
+		if token in "+-**/(<>!=":
+			# Handle + - / (
+			if token in "+-/(":
+				out = token
+			# Handle <= >= != ==
+			elif expr[pos + 1] == "=" and token in "<>!=":
+				out = token + expr[pos + 1]
+			# Handle * and **
+			elif token == "*":
+				if expr[pos + 1] == "*":
+					out = "**"
 				else:
-					pos += i - 1 - pos
-					break
-			operator_taken = False
-			yield number
+					out = "*"
+			# Handle "-" sign
+			i = pos + 1
+			while expr[i] == " ":
+				pos += 1
+				i += 1
+			if expr[i] == "-":
+				pos += len(out)
+				yield out
+				i += 1
+				while expr[i] == " ":
+					pos += 1
+					i += 1
+				num = "-"
+				while expr[i].isnumeric() or expr[i] == ".":
+					num += expr[i]
+					i += 1
+				out = num
 		# Handle )
 		elif token == ")":
-			operator_taken = False
-			yield token
-		# Handle * and **
-		elif token == "*":
-			operator_taken = True
-			if expr[pos + 1] == "*":
-				yield "**"
-				pos += 1
-			else:
-				yield token
+			out = ")"
 		# Handle number
 		elif token.isnumeric():
-			number = token
-			for i in range(pos + 1, len(expr)):
-				if expr[i].isnumeric() or expr[i]==".":
-					number += expr[i]
-				else:
-					pos += i - 1 - pos
-					break
-			operator_taken = False
-			yield number
+			num = token
+			i = pos + 1
+			while expr[i].isnumeric() or expr[i] == ".":
+				num += expr[i]
+				i += 1
+			out = num
 		# Handle other characters like blank space
 		else:
-			pass
-		pos += 1
+			pos += 1
+			continue
+		pos += len(out)
+		yield out
+
 	yield ";"
 
 
 if __name__ == "__main__":
-	print(list(new_split_iter("3+   (4 * 5)")))
-	print(list(new_split_iter("3+5--2*2/(-6**   34.5<=5   != 10)--5")))
+	print(list(new_split_iter("3+ (4 *5)")))
+	print(list(new_split_iter("3  +(4* 5)")))
+	print(list(new_split_iter("3+ -2")))
+	print(list(new_split_iter("3+-2")))
+	print(list(new_split_iter("3 + -2")))
+	print(list(new_split_iter("3+-   2")))
+	print(list(new_split_iter("3- -2")))
+	print(list(new_split_iter("3** 2")))
+	print(list(new_split_iter("3>=2")))
+	print(list(new_split_iter("3   !=   2")))
+	print(list(new_split_iter("3 wow 2")))
+	print(list(new_split_iter("3.2 + that is good 2")))
