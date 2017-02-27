@@ -1,14 +1,16 @@
 def new_split_iter(expr):
-	"""divide a character string into individual tokens, which need not be separated by spaces (but can be!)
-	also, the results are returned in a manner similar to iterator instead of a new data structure
-	"""
-	expr = expr + ";"  # append new symbol to mark end of data, for simplicity
+	if expr[-1] != ';':
+		expr += ";"
 	pos = 0  # begin at first character position in the list
-
+	neg_sign_possible = True
 	while expr[pos] != ";":  # repeat until the end of the input is found
 		token = expr[pos]
 		out = ""
-		if token in "+-**/(<>!=":
+		if neg_sign_possible and token == '-' and expr[pos + 1].isnumeric():
+			out = get_number(expr, pos)
+			neg_sign_possible = False
+		elif token in "+-**/(<>!=":
+			neg_sign_possible = True
 			# Handle + - / (
 			if token in "+-/(":
 				out = token
@@ -21,42 +23,38 @@ def new_split_iter(expr):
 					out = "**"
 				else:
 					out = "*"
-			# Handle "-" sign
-			i = pos + 1
-			while expr[i] == " ":
-				pos += 1
-				i += 1
-			if expr[i] == "-":
-				pos += len(out)
-				yield out
-				i += 1
-				while expr[i] == " ":
-					pos += 1
-					i += 1
-				num = "-"
-				while expr[i].isnumeric() or expr[i] == ".":
-					num += expr[i]
-					i += 1
-				out = num
-		# Handle )
-		elif token == ")":
-			out = ")"
-		# Handle number
-		elif token.isnumeric():
-			num = token
-			i = pos + 1
-			while expr[i].isnumeric() or expr[i] == ".":
-				num += expr[i]
-				i += 1
-			out = num
-		# Handle other characters like blank space
 		else:
-			pos += 1
-			continue
+			# Handle )
+			if token == ")":
+				out = ")"
+			# Handle number
+			elif token.isnumeric():
+				neg_sign_possible = False
+				out = get_number(expr, pos)
+			# Handle other characters like blank space
+			else:
+				pos += 1
+				continue
 		pos += len(out)
 		yield out
 
 	yield ";"
+
+
+def get_number(expr, pos):
+	num = ''
+	if expr[pos] == '-':
+		num += '-'
+		pos += 1
+	if expr[pos].isnumeric():
+		num += expr[pos]
+		pos += 1
+		while expr[pos].isnumeric() or expr[pos] == ".":
+			num += expr[pos]
+			pos += 1
+	else:
+		raise ValueError("Cannot get a number")
+	return num
 
 
 if __name__ == "__main__":
@@ -70,5 +68,3 @@ if __name__ == "__main__":
 	print(list(new_split_iter("3** 2")))
 	print(list(new_split_iter("3>=2")))
 	print(list(new_split_iter("3   !=   2")))
-	print(list(new_split_iter("3 wow 2")))
-	print(list(new_split_iter("3.2 + that is good 2")))

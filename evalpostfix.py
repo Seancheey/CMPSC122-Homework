@@ -1,10 +1,14 @@
 # author: Qiyi Shan
 # Date: 1/11/2017
-from Homework.infixtoiter import to_postfix
+from Homework.linkedlist import LinkedList
 
 
-def eval_infix(expr):
-	return eval_postfix(to_postfix(expr.split() + [";"]))
+def is_number(s):
+	try:
+		float(s)
+		return True
+	except ValueError:
+		return False
 
 
 def eval_postfix(expr):
@@ -13,41 +17,24 @@ def eval_postfix(expr):
 	:param expr: RPN expression
 	:return: result of the expression, a single number
 	"""
-	numbers = []
-	for x in expr:
-		if is_num(x):
-			numbers.append(int(x))
+	number_stack = LinkedList()
+	for i in expr:
+		if is_number(i):
+			number_stack.push(int(i))
 		else:
-			b = numbers.pop()
-			a = numbers.pop()
-			if x == '+':
-				numbers.append(a + b)
-			if x == '-':
-				numbers.append(a - b)
-			if x == '*':
-				numbers.append(a * b)
-			if x == '/':
-				numbers.append(a / b)
-			if x == '**':
-				numbers.append(a ** b)
-	if len(numbers) == 1:
-		return numbers[0]
+			b = number_stack.pop()
+			a = number_stack.pop()
+			if i == '+':
+				number_stack.push(a + b)
+			if i == '-':
+				number_stack.push(a - b)
+			if i == '*':
+				number_stack.push(a * b)
+			if i == '/':
+				number_stack.push(a / b)
+			if i == '**':
+				number_stack.push(a ** b)
+	if len(number_stack) == 1:
+		return number_stack._head._value
 	else:
 		raise SyntaxError("Too less operators")
-
-
-def is_num(expr):
-	try:
-		a = int(expr)
-		return True
-	except:
-		return False
-
-
-if __name__ == "__main__":
-	print(eval_infix("15 "))
-	print(eval_infix("2 + 3 "))
-	print(eval_infix(" 2 * 3 + 1  "))
-	print(eval_infix(" 2 + 3 * 1"))
-	print(eval_infix(" 3 ** 2"))
-	print(eval_infix(" 3 ** 2 ** 2 / ( 3 + 6 )"))

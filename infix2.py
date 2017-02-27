@@ -12,13 +12,15 @@ def eval_infix_sum(expr):
 	:return: numerical answer and the position pointer
 	"""
 	ans = eval_infix_product(expr)
-	while expr.peek() not in ');':
-		if expr.peek() == '+':
-			expr.__next__()
-			ans += eval_infix_product(expr)
-		elif expr.peek() == '-':
-			expr.__next__()
-			ans -= eval_infix_product(expr)
+	oper = expr.peek()
+	while oper in '+-':
+		expr.__next__()
+		other = eval_infix_product(expr)
+		if oper == '+':
+			ans += other
+		elif oper == '-':
+			ans -= other
+		oper = expr.peek()
 	return ans
 
 
@@ -30,13 +32,15 @@ def eval_infix_product(expr):
 	:return: numberical answer and the position pointer
 	"""
 	ans = eval_infix_exponent(expr)
-	while expr.peek() not in '+-);':
-		if expr.peek() == '*':
-			expr.__next__()
-			ans *= eval_infix_exponent(expr)
-		elif expr.peek() == '/':
-			expr.__next__()
-			ans /= eval_infix_exponent(expr)
+	oper = expr.peek()
+	while expr.peek() in "*/%":
+		expr.__next__()
+		other = eval_infix_exponent(expr)
+		if oper == '*':
+			ans *= other
+		elif oper == '/':
+			ans /= other
+		oper = expr.peek()
 	return ans
 
 
@@ -48,12 +52,15 @@ def eval_infix_exponent(expr):
 	:return: numberical answer and the position pointer
 	"""
 	ans = eval_infix_factor(expr)
-	while expr.peek() not in '*/+-);':
-		if expr.peek() == '**':
-			expr.__next__()
-			ans **= eval_infix_exponent(expr)
+	oper = expr.peek()
+	while expr.peek() == "**":
+		expr.__next__()
+		other = eval_infix_exponent(expr)
+		if oper == '**':
+			ans **= other
 		else:
 			return eval_infix_factor(expr)
+		oper = expr.peek()
 	return ans
 
 
@@ -64,12 +71,13 @@ def eval_infix_factor(expr):
 	:param pos: current list pointer
 	:return: numberical answer and the position pointer
 	"""
-	a = expr.__next__()
-	if a == '(':
+	if expr.peek() == '(':
+		expr.__next__()
 		ans = eval_infix_sum(expr)
-		return ans
 	else:
-		return int(a)  # convert string to int, and move past
+		ans = int(expr.peek())
+	expr.__next__()
+	return ans  # convert string to int, and move past
 
 
 def eval_infix_iter(iterator):
@@ -83,12 +91,5 @@ def eval_infix(expr):
 
 
 if __name__ == "__main__":
-	print(eval_infix("1+ 2"))
-	print(eval_infix("3 * 5"))
-	print(eval_infix("2 ** 3"))
-	print(eval_infix("1 + 2 * 3"))
-	print(eval_infix("2 * 3 + 1"))
-	print(eval_infix("2 * ( 3 + 1 )"))
-	print(eval_infix("( 3 + 1 ) * 2"))
-	print(eval_infix("2 +2 ** 3 ** 2"))
-	print(eval_infix("2 + ( 2 ** 3 ) ** 2"))
+	print(eval_infix("2 + ( 2 * 3 ) + 4"))
+	print(eval_infix("0+(2*5)+2"))

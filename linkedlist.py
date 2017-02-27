@@ -9,13 +9,11 @@ class LinkedList:
 			self._value = v
 			self._next = n
 
-	def __init__(self):
+	def __init__(self, _list=None):
 		self._tail = self._head = None
-
-	def __init__(self, list):
-		self._tail = self._head = None
-		for value in list:
-			self.push(value)
+		if _list != None:
+			for value in _list:
+				self.push(value)
 
 	def push(self, value):
 		if not self._tail or not self._head:
@@ -33,9 +31,10 @@ class LinkedList:
 			return a
 		while i._next != self._tail:
 			i = i._next
-		i._next = None
 		self._tail = i
-		return self._tail
+		val = i._next._value
+		i._next = None
+		return val
 
 	def __iter__(self):
 		current = self._head
@@ -64,10 +63,8 @@ class LinkedList:
 
 
 if __name__ == "__main__":
-	a = LinkedList([1, 2, 3])
+	a = LinkedList(range(0, 10))
 	print(a)
-	a.pop()
-	print(a)
-	a.push(5)
-	print(a)
-	print(a.__len__())
+	a.push(10)
+	b = a.pop()
+	print(a,'+',b)
