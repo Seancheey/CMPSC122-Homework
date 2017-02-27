@@ -34,13 +34,13 @@ def genexpr(_len):
 
 def test(_expr):
 	try:
-		if eval_infix(_expr) == eval(_expr):
+		if eval_postfix(to_postfix(_expr)) == eval(_expr):
 			print('Correct')
 		else:
-			print(list(new_split_iter(_expr)))
-			print('Wrong ', str(_expr), '=', eval_infix(_expr), 'should be', eval(_expr))
+			print(list(to_postfix(_expr)))
+			print('Wrong ', str(_expr), '=', eval_postfix(to_postfix(_expr)), 'should be', eval(_expr))
 	except ValueError:
-		print('!!get value error', list(new_split_iter(_expr)))
+		print('!!get value error', list(to_postfix(_expr)))
 	except ZeroDivisionError:
 		print('zero division error')
 
