@@ -1,3 +1,5 @@
+# author Qiyi Shan
+# date 2.27.2017
 from Homework.peekable import Peekable, peek
 from Homework.newsplit import new_split_iter
 from random import randint

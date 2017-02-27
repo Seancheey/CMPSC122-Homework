@@ -60,7 +60,7 @@ class VarTree:
 
 	def _str(self, here):
 		if here is None:
-			return "N/A"
+			return "null"
 		return "(%s: %s --> %s, %s)" % (
 			str(here.key), str(here.value), str(self._str(here.left)), str(self._str(here.right)))
 

@@ -1,3 +1,6 @@
+# author Qiyi Shan
+# date 1.19.2017
+
 def new_split_iter(expr):
 	if expr[-1] != ';':
 		expr += ";"

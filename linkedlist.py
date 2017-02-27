@@ -1,3 +1,6 @@
+# author Qiyi Shan
+# date 1.19.2017
+
 class LinkedList:
 	"""A singly linked list"""
 	__slots__ = ("_tail", "_head")
@@ -67,4 +70,4 @@ if __name__ == "__main__":
 	print(a)
 	a.push(10)
 	b = a.pop()
-	print(a,'+',b)
+	print(a, '+', b)
