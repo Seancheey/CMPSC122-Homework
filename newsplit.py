@@ -1,5 +1,7 @@
 # author Qiyi Shan
-# date 1.19.2017
+# date created 1.19.2017
+# date modified 3.1.2017
+
 
 def new_split_iter(expr):
 	if expr[-1] != ';':
@@ -11,6 +13,9 @@ def new_split_iter(expr):
 		out = ""
 		if neg_sign_possible and token == '-' and expr[pos + 1].isnumeric():
 			out = get_number(expr, pos)
+			neg_sign_possible = False
+		elif token.isalpha():
+			out = get_variable(expr, pos)
 			neg_sign_possible = False
 		elif token in "+-**/(<>!=":
 			neg_sign_possible = True
@@ -44,6 +49,17 @@ def new_split_iter(expr):
 	yield ";"
 
 
+def get_variable(expr, pos):
+	if expr[pos].isalpha():
+		v = expr[pos]
+		while pos + 1 < len(expr) and expr[pos + 1].isalpha():
+			pos += 1
+			v += expr[pos]
+		return v
+	else:
+		raise ValueError("get_variable(expr, pos) expects to take a variable but get", expr[pos])
+
+
 def get_number(expr, pos):
 	num = ''
 	if expr[pos] == '-':
@@ -56,7 +72,7 @@ def get_number(expr, pos):
 			num += expr[pos]
 			pos += 1
 	else:
-		raise ValueError("Cannot get a number")
+		raise ValueError("get_number(expr, pos) expects to take a number but get", expr[pos])
 	return num
 
 
@@ -71,3 +87,5 @@ if __name__ == "__main__":
 	print(list(new_split_iter("3** 2")))
 	print(list(new_split_iter("3>=2")))
 	print(list(new_split_iter("3   !=   2")))
+	print(list(new_split_iter("a + 5-6+beta")))
+
