@@ -1,6 +1,7 @@
 from Homework.evalpostfix import eval_postfix
-from Homework.infixtoiter import to_postfix
 from random import randint
+import Homework.infixtoiter
+import Homework.infixtopostfix
 
 
 class ExprUnitTest:
@@ -32,15 +33,15 @@ class ExprUnitTest:
 		s += self.rand_num()
 		return s
 
-	def test(self, test_func, correct_output, wrong_output):
+	def test(self, test_func, compare_func=eval):
 		try:
 			self.tested_expr = self.genexpr(3)
-			cor = eval(self.tested_expr)
+			cor = compare_func(self.tested_expr)
 			tes = test_func(self.tested_expr)
 			if cor == tes:
-				print(correct_output)
+				return True
 			else:
-				print(wrong_output)
+				return False
 		except ValueError:
 			print('!!get value error')
 		except ZeroDivisionError:
@@ -48,13 +49,23 @@ class ExprUnitTest:
 
 
 def test_eval(expr):
-	return eval_postfix(to_postfix(expr))
+	a = list(Homework.infixtopostfix.to_postfix(expr))
+	return a
+
+
+def compare_eval(expr):
+	a = list(Homework.infixtoiter.to_postfix(expr))
+	return a
 
 
 def main():
 	a = ExprUnitTest()
-	for i in range(20):
-		a.test(test_eval, "Correct", "Wrong: "+a.tested_expr)
+	for i in range(200):
+		res = a.test(test_eval, compare_eval)
+		if res is False:
+			print("Wrong:", a.tested_expr)
+			print(test_eval(a.tested_expr))
+			print(compare_eval(a.tested_expr))
 
 
 if __name__ == '__main__':
