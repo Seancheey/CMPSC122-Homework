@@ -1,6 +1,7 @@
 # author Qiyi Shan
 # date 1.19.2017
 
+
 class LinkedList:
 	"""A singly linked list"""
 	__slots__ = ("_tail", "_head")
@@ -27,6 +28,8 @@ class LinkedList:
 
 	def pop(self):
 		i = self._head
+		if self._head is None:
+			return None
 		if i == self._tail:
 			a = self._head._value
 			self._tail = None
