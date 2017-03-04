@@ -20,7 +20,7 @@ def new_split_iter(expr):
 		elif token in "+-**/(<>!=":
 			neg_sign_possible = True
 			# Handle + - / (
-			if token in "+-/(":
+			if token in "+-/(=":
 				out = token
 			# Handle <= >= != ==
 			elif expr[pos + 1] == "=" and token in "<>!=":
