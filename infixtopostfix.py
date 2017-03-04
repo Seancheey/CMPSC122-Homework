@@ -46,4 +46,4 @@ def to_postfix(expr_iter):
 
 
 if __name__ == "__main__":
-	print(list(to_postfix(new_split_iter("a = 3 + b"))))
+	print(list(to_postfix(new_split_iter("x = 1 + (y = 4)"))))
