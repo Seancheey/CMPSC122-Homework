@@ -42,7 +42,7 @@ def eval_postfix(tree: VarTree, expr):
 			elif item == '/':
 				number_stack.push(a_num / b_num)
 			elif item == '**':
-				number_stack.push(a_num ** b_num)
+				number_stack.push(a_num ** b_num if a_num >= 0 else -(a_num ** b_num))
 	if len(number_stack) == 1:
 		if type(number_stack._head._value) is str:
 			return V.lookup(number_stack._head._value)
