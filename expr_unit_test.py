@@ -1,20 +1,20 @@
 from Homework.evalpostfix import eval_postfix
 from random import randint
-import Homework.infixtoiter
-import Homework.infixtopostfix
+from Homework.infixtopostfix import to_postfix
+from Homework.vartree import VarTree
 
 
 class ExprUnitTest:
 	operators = []
-	num_range = ()
+	num_range = range(-5, 5)
 	tested_expr = ""
 
-	def __init__(self, operators=["+", "-", "*", "/", '**'], num_range=(-5, 5)):
+	def __init__(self, operators=["+", "-", "*", "/", '**'], num_range=range(-5, 5)):
 		self.operators = operators
 		self.num_range = num_range
 
 	def rand_num(self):
-		return str(randint(1, self.num_range[1])) if randint(1, 2) == 1 else str(randint(self.num_range[0], -1))
+		return str(list(self.num_range)[randint(0, len(self.num_range) - 1)])
 
 	@staticmethod
 	def __rand_space():
@@ -46,26 +46,26 @@ class ExprUnitTest:
 			print('!!get value error')
 		except ZeroDivisionError:
 			print('zero division error')
+		return True
+
+
+V = VarTree()
 
 
 def test_eval(expr):
-	a = list(Homework.infixtopostfix.to_postfix(expr))
-	return a
-
-
-def compare_eval(expr):
-	a = list(Homework.infixtoiter.to_postfix(expr))
+	a = eval_postfix(V, to_postfix(expr))
 	return a
 
 
 def main():
 	a = ExprUnitTest()
 	for i in range(200):
-		res = a.test(test_eval, compare_eval)
-		if res is False:
-			print("Wrong:", a.tested_expr)
+		result_correct = a.test(test_eval)
+		print("Correct" if result_correct else "Wrong")
+		if not result_correct:
+			print(a.tested_expr)
 			print(test_eval(a.tested_expr))
-			print(compare_eval(a.tested_expr))
+			print(eval(a.tested_expr))
 
 
 if __name__ == '__main__':
