@@ -1,3 +1,6 @@
+# author: Qiyi Shan
+# date: 3.3.2017
+
 from Homework.newsplit import new_split_iter
 
 
@@ -22,7 +25,6 @@ def to_postfix(expr_iter):
 	# make sure the type of parameter is Iterator
 	if type(expr_iter) == str:
 		expr_iter = list(new_split_iter(expr_iter))
-
 	operator_list = []
 	for item in expr_iter:
 		if item.isnumeric() or item[1:].isnumeric() and item[0] == '-' or item.isalpha():
@@ -45,3 +47,7 @@ def to_postfix(expr_iter):
 						item):
 						yield operator_list.pop()
 				operator_list.append(item)
+
+
+if __name__ == "__main__":
+	print(list(to_postfix(new_split_iter("a = 3 + b"))))
