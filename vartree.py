@@ -47,7 +47,11 @@ class VarTree:
 		self._root = self._insert(self._root, key, value)
 
 	def lookup(self, var):
-		return self._search(self._root, var).value
+		result = self._search(self._root, var)
+		if result is not None:
+			return result.value
+		else:
+			return None
 
 	def is_empty(self):
 		return self._root is None
@@ -72,4 +76,7 @@ if __name__ == "__main__":
 	v = VarTree()
 	v.assign("a", 15)
 	v.assign("b", 20)
+	print('a', v.lookup('a'))
+	print('b', v.lookup('b'))
+	print('1', v.lookup('1'))
 	print(v)
