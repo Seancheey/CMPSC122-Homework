@@ -32,7 +32,7 @@ def eval_postfix(tree: VarTree, expr):
 				if tree.lookup(a_num) is not None:
 					a_num = tree.lookup(a_num)
 				else:
-					raise ValueError("Can't find variable with name " + a_num)
+					a_num = 0
 			if item == '+':
 				number_stack.push(a_num + b_num)
 			elif item == '-':
@@ -45,7 +45,8 @@ def eval_postfix(tree: VarTree, expr):
 				number_stack.push(a_num ** b_num if a_num >= 0 else -(a_num ** b_num))
 	if len(number_stack) == 1:
 		if type(number_stack._head._value) is str:
-			return V.lookup(number_stack._head._value)
+			value = V.lookup(number_stack._head._value)
+			return value if value is not None else 0
 		return number_stack._head._value
 	else:
 		raise SyntaxError("Too less operators: " + str(number_stack))
@@ -53,6 +54,7 @@ def eval_postfix(tree: VarTree, expr):
 
 if __name__ == '__main__':
 	V = VarTree()
+	print(eval_postfix(V, ['sean']))
 	print(eval_postfix(V, ['sean', '2', '=']))
 	print(eval_postfix(V, ['new', 'sean', '3', '+', '=']))
 	print(eval_postfix(V, ['new', '1', '+']))
