@@ -1,6 +1,7 @@
 # author: Qiyi Shan
 # Date: 1/11/2017
 from Homework.linkedlist import LinkedList
+from Homework.vartree import VarTree
 
 
 def is_number(s):
@@ -11,7 +12,7 @@ def is_number(s):
 		return False
 
 
-def eval_postfix(expr):
+def eval_postfix(V: VarTree, expr):
 	"""
 	Use RPN expression to calculate result
 	:param expr: RPN expression
@@ -19,20 +20,28 @@ def eval_postfix(expr):
 	"""
 	number_stack = LinkedList()
 	for i in expr:
-		if is_number(i):
-			number_stack.push(int(i))
+		if is_number(i) or i.isalpha():
+			number_stack.push(int(i) if is_number(i) else i)
 		else:
 			b = number_stack.pop()
 			a = number_stack.pop()
+			if i == '=':
+				if a.isnumeric():
+					raise ValueError("Assign a value to a number")
+				else:
+					V.assign(a, b)
+					number_stack.push(V.lookup(a))
+			if V.lookup(a) is not None:
+				a = V.lookup(a)
 			if i == '+':
 				number_stack.push(a + b)
-			if i == '-':
+			elif i == '-':
 				number_stack.push(a - b)
-			if i == '*':
+			elif i == '*':
 				number_stack.push(a * b)
-			if i == '/':
+			elif i == '/':
 				number_stack.push(a / b)
-			if i == '**':
+			elif i == '**':
 				number_stack.push(a ** b)
 	if len(number_stack) == 1:
 		return number_stack._head._value
