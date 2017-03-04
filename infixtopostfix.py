@@ -1,6 +1,5 @@
 # author: Qiyi Shan
 # date: 3.3.2017
-
 from Homework.newsplit import new_split_iter
 
 
@@ -36,7 +35,7 @@ def to_postfix(expr_iter):
 			elif item == ')':
 				while operator_list[-1] != '(':
 					yield operator_list.pop()
-				operator_list.pop()
+				operator_list.pop()  # remove "("
 			else:
 				if item != '**' and item != '=' and item != '(':
 					while len(operator_list) > 0 and operator_list[-1] != '(' and priority(
