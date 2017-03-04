@@ -31,17 +31,14 @@ def to_postfix(expr_iter):
 			yield item
 		else:
 			if item == ';':
-				operator_list.reverse()
-				for op in operator_list:
-					yield op
-			elif item == '(':
-				operator_list.append(item)
+				while len(operator_list) != 0:
+					yield operator_list.pop()
 			elif item == ')':
 				while operator_list[-1] != '(':
 					yield operator_list.pop()
 				operator_list.pop()
 			else:
-				if item != '**' and item != '=':
+				if item != '**' and item != '=' and item != '(':
 					while len(operator_list) > 0 and operator_list[-1] != '(' and priority(
 							operator_list[-1]) >= priority(
 						item):
