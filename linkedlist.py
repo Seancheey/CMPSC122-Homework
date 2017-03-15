@@ -49,7 +49,7 @@ class LinkedList:
 			current = current._next
 
 	def __str__(self):
-		return ' '.join(list(iter(self)))
+		return ','.join(list(iter(self)))
 
 	def __len__(self):
 		i = 0
@@ -58,6 +58,12 @@ class LinkedList:
 			i += 1
 			current = current._next
 		return i
+
+	def top(self):
+		return self._tail._value
+
+	def is_empty(self):
+		return self._head is None
 
 	def remove(self, value):
 		"""Remove one occurrence of the given value from the list"""
@@ -69,8 +75,16 @@ class LinkedList:
 
 
 if __name__ == "__main__":
+	a = LinkedList()
+	print('empty list:', a)
+	a.pop()
+	print('after pop:', a)
+	for i in range(5):
+		a.push(i)
+	print('after push 5 values:', a)
 	a = LinkedList(range(0, 10))
-	print(a)
-	a.push(10)
+	print('list range from 0 to 10:', a)
+	a.push(100)
+	print('after push 100:', a)
 	b = a.pop()
-	print(a, '+', b)
+	print('after pop', a)

@@ -1,16 +1,8 @@
 # author Qiyi Shan
 # date 2.27.2017
-from Homework.peekable import Peekable, peek
+from Homework.peekable import Peekable
 from Homework.newsplit import new_split_iter
-from random import randint
-
-
-def is_number(s):
-	try:
-		float(s)
-		return True
-	except ValueError:
-		return False
+from Homework.linkedlist import LinkedList
 
 
 def to_postfix(expr):
@@ -38,7 +30,7 @@ def postfix_sum(expr_iter):
 	# make sure the type of parameter is Iterator
 	if type(expr_iter) == str:
 		expr_iter = list(new_split_iter(expr_iter))
-	operator_list = []
+	operator_list = LinkedList()
 	for item in expr_iter:
 		if item.isnumeric() or item[1:].isnumeric() and item[0] == '-' or item.isalpha():
 			yield item
@@ -47,13 +39,18 @@ def postfix_sum(expr_iter):
 				while len(operator_list) != 0:
 					yield operator_list.pop()
 			elif item == ')':
-				while operator_list[-1] != '(':
+				while operator_list.top() != '(':
 					yield operator_list.pop()
 				operator_list.pop()  # remove "("
 			else:
 				if item != '**' and item != '=' and item != '(':
-					while len(operator_list) > 0 and operator_list[-1] != '(' and priority(
-							operator_list[-1]) >= priority(
+					while len(operator_list) > 0 and operator_list.top() != '(' and priority(
+							operator_list.top()) >= priority(
 						item):
 						yield operator_list.pop()
-				operator_list.append(item)
+				operator_list.push(item)
+
+
+if __name__ == '__main__':
+	print(list(to_postfix('4 - (1 - 4) ** 1')))
+	print(list(to_postfix('3*(1 - 4 ) ** 1')))
