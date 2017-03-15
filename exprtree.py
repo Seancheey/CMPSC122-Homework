@@ -111,6 +111,8 @@ class Oper(ExprTree):
 			return v1 <= v2
 		elif o == '==':
 			return v1 == v2
+		elif o == '!=':
+			return v1 != v2
 		else:
 			raise NotImplementedError(str(o) + " operation is not implemented")
 
@@ -126,7 +128,7 @@ class Cond(ExprTree):
 
 	def __iter__(self):
 		yield '('
-		yield self._expr
+		yield self._expr.__str__()
 		yield '?'
 		yield self._true
 		yield ':'
@@ -147,6 +149,39 @@ class Cond(ExprTree):
 			return self._false.evaluate(variables)
 
 
+class Logic(ExprTree):
+	__slots__ = '_expr1', '_operator', '_expr2'
+
+	def __init__(self, expr1: ExprTree, oper: str, expr2: ExprTree):
+		self._expr1 = expr1
+		self._operator = oper
+		self._expr2 = expr2
+
+	def __iter__(self):
+		yield '('
+		yield self._expr1.__str__()
+		yield self._operator
+		yield self._expr2.__str__()
+		yield ')'
+
+	def postfix(self):
+		yield self._expr1
+		yield self._expr2
+		yield self._operator
+
+	def evaluate(self, variables):
+		if self._operator == 'and':
+			if self._expr1.evaluate(variables) and self._expr2.evaluate(variables):
+				return True
+			else:
+				return False
+		elif self._operator == 'or':
+			if self._expr1.evaluate(variables) or self._expr2.evaluate(variables):
+				return True
+			else:
+				return False
+
+
 if __name__ == '__main__':
 	V = VarTree()
 	VA = Var("A")
@@ -157,6 +192,8 @@ if __name__ == '__main__':
 	print("Postfix iteration: ", list(A.postfix()))
 	print("Execution: ", A.evaluate(V))
 	print("Afterwards, A = ", VA.evaluate(V))
+	print('Logic 0 and 6: ', Logic(Value(0), 'and', Value(6)).evaluate(V))
+	print('Logic 5 and 6: ', Logic(Value(5), 'and', Value(6)).evaluate(V))
 
 	# If A == 5, return A+2 else return 3
 	CondTest = Cond(Oper(VA, '==', Value(5)), Oper(VA, '+', Value(2)), Value(3))
