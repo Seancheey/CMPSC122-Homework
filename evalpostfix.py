@@ -42,7 +42,7 @@ def eval_postfix(tree: VarTree, expr):
 			elif item == '/':
 				number_stack.push(a_num / b_num)
 			elif item == '**':
-				number_stack.push(a_num ** b_num if a_num >= 0 else -(a_num ** b_num))
+				number_stack.push(a_num ** b_num)
 	if len(number_stack) == 1:
 		if type(number_stack._head._value) is str:
 			value = V.lookup(number_stack._head._value)
@@ -54,8 +54,4 @@ def eval_postfix(tree: VarTree, expr):
 
 if __name__ == '__main__':
 	V = VarTree()
-	print(eval_postfix(V, ['sean']))
-	print(eval_postfix(V, ['sean', '2', '=']))
-	print(eval_postfix(V, ['new', 'sean', '3', '+', '=']))
-	print(eval_postfix(V, ['new', '1', '+']))
-	print(eval_postfix(V, ['new']))
+	print(eval_postfix(V, ['4', '1', '4', '-', '1', '**', '-']))
