@@ -1,11 +1,12 @@
 # author Qiyi Shan
 # Date 3.15.2017
 
-from Homework.exprtree import Var, Cond, Oper, Value
+from Homework.exprtree import Var, Cond, Oper, Value, Logic
 from Homework.newsplit import new_split_iter
 
-__priority_list = ['=', '?', '<><=>=', '+-', '*/%', '**']
-__to_right_direction = {'=': False, '?': False, '<><=>=': True, '+-': True, '*/%': True, '**': False}
+__priority_list = ['=', 'and', 'or', '?', '<><=>==!=', '+-', '*/%', '**']
+__to_right_direction = {'=': False, 'and': True, 'or': True, '?': False, '<><=>==!=': True, '+-': True, '*/%': True,
+						'**': False}
 
 
 def to_expr_tree(expr):
@@ -34,6 +35,8 @@ def __to_tree(expr):
 					for j in range(i + 1, len(expr)):
 						if expr[j] == ':':
 							return Cond(__to_tree(expr[:i]), __to_tree(expr[i + 1:j]), __to_tree(expr[j + 1:]))
+				elif expr[i] in 'andor':
+					return Logic(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
 				else:
 					return Oper(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
 
@@ -62,3 +65,4 @@ if __name__ == "__main__":
 	print(to_expr_tree("A = 2 + 3 * B - xyz"))
 	print(to_expr_tree("x < 0 ? 0 - x : x"))
 	print(to_expr_tree("3* (5+4 /3) + 6"))
+	print(to_expr_tree('1 and 1'))

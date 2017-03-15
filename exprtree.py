@@ -1,3 +1,6 @@
+# author Qiyi Shan
+# date 3.15.2017
+
 from abc import ABCMeta, abstractmethod
 from Homework.vartree import VarTree
 
@@ -94,10 +97,10 @@ class Oper(ExprTree):
 			return v1 * v2
 		elif o == '/':
 			return v1 / v2
-		elif o == '**':
-			return v1 ** v2
 		elif o == '%':
 			return v1 % v2
+		elif o == '**':
+			return v1 ** v2
 		elif o == '=':
 			variables.assign(key=self._value1._name, value=v2)
 			return v2
