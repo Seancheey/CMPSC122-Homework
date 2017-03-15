@@ -47,7 +47,7 @@ class Value(ExprTree):
 	__slots__ = '_value'
 
 	def __init__(self, v):
-		self._value = v
+		self._value = int(v)
 
 	def __iter__(self):
 		yield self._value
