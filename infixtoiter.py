@@ -49,6 +49,8 @@ def postfix_sum(expr_iter):
 						item):
 						yield operator_list.pop()
 				operator_list.push(item)
+	while len(operator_list) != 0:
+		yield operator_list.pop()
 
 
 if __name__ == '__main__':
