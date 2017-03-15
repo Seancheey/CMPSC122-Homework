@@ -1,7 +1,10 @@
+# author Qiyi Shan
+# Date 3.15.2017
+
 from Homework.exprtree import Var, Cond, Oper, Value
 from Homework.newsplit import new_split_iter
 
-__oper_priority_list = ['=', '?', '<><=>=', '+-', '*/%', '**']
+__priority_list = ['=', '?', '<><=>=', '+-', '*/%', '**']
 __to_right_direction = {'=': False, '?': False, '<><=>=': True, '+-': True, '*/%': True, '**': False}
 
 
@@ -13,13 +16,14 @@ def to_expr_tree(expr):
 
 
 def __to_tree(expr):
+	"""Recursively convert expression to tree"""
 	if len(expr) == 1:
 		if expr[0].isnumeric():
 			return Value(expr[0])
 		else:
 			return Var(expr[0])
 
-	for operator in __oper_priority_list:
+	for operator in __priority_list:
 		if __to_right_direction[operator]:
 			index_order = range(len(expr) - 1, -1, -1)
 		else:
@@ -34,14 +38,13 @@ def __to_tree(expr):
 					return Oper(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
 
 	if expr[0] == '(':
-		for i in range(len(expr)):
-			if i == ')' and i == len(expr) - 1:
-				return __to_tree(expr[1:i - 1])
+		return __to_tree(expr[1:-1])
 
 	raise NotImplementedError(str(expr) + " not implemented")
 
 
 def __in_brackets(expr, pos):
+	"""Test if an operator is included in brackets"""
 	inbracket = False
 	for i in range(len(expr)):
 		if i == pos:
@@ -58,3 +61,4 @@ if __name__ == "__main__":
 	print(to_expr_tree("A = 5"))
 	print(to_expr_tree("A = 2 + 3 * B - xyz"))
 	print(to_expr_tree("x < 0 ? 0 - x : x"))
+	print(to_expr_tree("3* (5+4 /3) + 6"))
