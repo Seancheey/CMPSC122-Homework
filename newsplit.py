@@ -1,6 +1,6 @@
 # author Qiyi Shan
 # date created 1.19.2017
-# date modified 3.1.2017
+# date modified 3.15.2017
 
 
 def new_split_iter(expr):
@@ -17,14 +17,14 @@ def new_split_iter(expr):
 		elif token.isalpha():
 			out = get_variable(expr, pos)
 			neg_sign_possible = False
-		elif token in "+-**/(<>!=?:%":
+		elif token in "+-**/(<>!==?:%":
 			neg_sign_possible = True
-			# Handle + - / (
-			if token in "+-/(=?:<>%":
-				out = token
 			# Handle <= >= != ==
-			elif expr[pos + 1] == "=" and token in "<>!=":
+			if expr[pos + 1] == "=" and token in "<>!=":
 				out = token + expr[pos + 1]
+			# Handle + - / (
+			elif token in "+-/(=?:<>%":
+				out = token
 			# Handle * and **
 			elif token == "*":
 				if expr[pos + 1] == "*":
@@ -81,3 +81,4 @@ if __name__ == "__main__":
 	print(list(new_split_iter("a + 5-6+beta")))
 	print(list(new_split_iter("1 = 4?33:3334")))
 	print(list(new_split_iter("1 + 0 ? 0 +3 : 5")))
+	print(list(new_split_iter("1+2-3*4/5%6**7=6==5!=4<6>(8<=9>=10?3:10) and 5 or 6")))
