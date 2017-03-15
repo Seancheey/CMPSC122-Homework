@@ -17,50 +17,43 @@ def to_postfix(expr):
 	return postfix_sum(Peekable(new_split_iter(expr)))
 
 
-def postfix_sum(expr):
-	"""
-	convert normal math expression into postfix expression
-	:param expr: a normal math wexpression waiting to be converted
-	:return: converted postfix expression
-	"""
-	operator_stack = []
-	for x in expr:
-		if is_number(x):
-			yield x
+def priority(operator):
+	if operator in '+-':
+		return 1
+	elif operator in '*/':
+		return 2
+	elif operator == '**':
+		return 3
+	elif operator == '(':
+		return 4
+	elif operator == ')':
+		return 0
+	elif operator == '=':
+		return -1
+	else:
+		raise ValueError("%s not supported by priority function" % operator)
+
+
+def postfix_sum(expr_iter):
+	# make sure the type of parameter is Iterator
+	if type(expr_iter) == str:
+		expr_iter = list(new_split_iter(expr_iter))
+	operator_list = []
+	for item in expr_iter:
+		if item.isnumeric() or item[1:].isnumeric() and item[0] == '-' or item.isalpha():
+			yield item
 		else:
-			# Handle ";", pop all the rest in the stack into new expression
-			if x == ';':
-				while len(operator_stack) != 0:
-					if operator_stack[-1] != '(':
-						yield operator_stack.pop()
-					else:
-						raise SyntaxError('Missing bracket')
-			# Handle "(", put it into stack
-			elif x == '(':
-				operator_stack.append(x)
-			# Handle ")", pop all operators into new expression until a "(" found
-			elif x == ')':
-				while len(operator_stack) > 0 and operator_stack[-1] != "(":
-					yield operator_stack.pop()
-				if len(operator_stack) > 0 and operator_stack[-1] == '(':
-					operator_stack.pop()
-				else:
-					raise SyntaxError('Missing bracket')
-			# Handel "*" or "/", put it into stack and do nothing, since they have highest priority
-			elif x in '*/':
-				while len(operator_stack) > 0 and operator_stack[-1] in "/**" and operator_stack[-1] != '(':
-					yield operator_stack.pop()
-				operator_stack.append(x)
-			# Handle "+" or "-", first put all higher priority operators into new expression, then put itself into new expression
-			elif x in '+-':
-				while len(operator_stack) > 0 and operator_stack[-1] in "+-/**" and operator_stack[-1] != "(":
-					yield operator_stack.pop()
-				operator_stack.append(x)
-			# Handel "**", put it into stack, waiting for next different operator being added to pop it out
-			elif x == '**':
-				operator_stack.append(x)
+			if item == ';':
+				while len(operator_list) != 0:
+					yield operator_list.pop()
+			elif item == ')':
+				while operator_list[-1] != '(':
+					yield operator_list.pop()
+				operator_list.pop()  # remove "("
 			else:
-				raise SyntaxError('Unrecognized operator found:' + x)
-
-
-operators = ["+", "-", "*", "/", "**"]
+				if item != '**' and item != '=' and item != '(':
+					while len(operator_list) > 0 and operator_list[-1] != '(' and priority(
+							operator_list[-1]) >= priority(
+						item):
+						yield operator_list.pop()
+				operator_list.append(item)
