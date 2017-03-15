@@ -41,6 +41,8 @@ def eval_postfix(tree: VarTree, expr):
 				number_stack.push(a_num * b_num)
 			elif item == '/':
 				number_stack.push(a_num / b_num)
+			elif item == '%':
+				number_stack.push(a_num % b_num)
 			elif item == '**':
 				number_stack.push(a_num ** b_num)
 	if len(number_stack) == 1:

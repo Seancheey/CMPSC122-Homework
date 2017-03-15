@@ -17,10 +17,10 @@ def new_split_iter(expr):
 		elif token.isalpha():
 			out = get_variable(expr, pos)
 			neg_sign_possible = False
-		elif token in "+-**/(<>!=?:":
+		elif token in "+-**/(<>!=?:%":
 			neg_sign_possible = True
 			# Handle + - / (
-			if token in "+-/(=?:<>":
+			if token in "+-/(=?:<>%":
 				out = token
 			# Handle <= >= != ==
 			elif expr[pos + 1] == "=" and token in "<>!=":
