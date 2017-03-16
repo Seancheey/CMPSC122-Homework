@@ -1,12 +1,12 @@
 # author Qiyi Shan
-# Date 3.15.2017
+# Date 3.16.2017
 
-from Homework.exprtree import Var, Cond, Oper, Value
-from Homework.newsplit import new_split_iter
+from Homework.exprtree import Var, Cond, Oper, Value, Nega
+from Homework.newsplit import new_split_iter, NegativeSign
 
-__priority_list = ['=', 'and', 'or', '?', '< > <= >= == !=', '+ -', '* / %', '**']
+__priority_list = ['=', 'and', 'or', '?', '< > <= >= == !=', '+ -', '* / %', NegativeSign, '**']
 __to_right_direction = {'=': False, 'and': True, 'or': True, '?': False, '< > <= >= == !=': True, '+ -': True,
-						'* / %': True, '**': False}
+						'* / %': True, NegativeSign: True, '**': False}
 
 
 def to_expr_tree(expr):
@@ -35,6 +35,8 @@ def __to_tree(expr):
 					for j in range(i + 1, len(expr)):
 						if expr[j] == ':':
 							return Cond(__to_tree(expr[:i]), __to_tree(expr[i + 1:j]), __to_tree(expr[j + 1:]))
+				if expr[i] is NegativeSign:
+					return Nega(__to_tree(expr[i + 1:]))
 				else:
 					return Oper(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
 
@@ -59,6 +61,7 @@ def __in_brackets(expr, pos):
 
 if __name__ == "__main__":
 	print(to_expr_tree("5"))
+	print(to_expr_tree('-5**9'))
 	print(to_expr_tree("A = 5"))
 	print(to_expr_tree("A = 2 + 3 * B - xyz"))
 	print(to_expr_tree("x < 0 ? 0 - x : x"))

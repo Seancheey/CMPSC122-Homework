@@ -1,8 +1,9 @@
 # author Qiyi Shan
-# date 3.15.2017
+# date 3.16.2017
 
 from abc import ABCMeta, abstractmethod
 from Homework.vartree import VarTree
+from Homework.newsplit import NegativeSign
 
 
 class ExprTree(metaclass=ABCMeta):
@@ -156,6 +157,28 @@ class Cond(ExprTree):
 			return self._true.evaluate(variables)
 		else:
 			return self._false.evaluate(variables)
+
+
+class Nega(ExprTree):
+	"""A Negative Operation leaf"""
+	__slots__ = '_expr'
+
+	def __init__(self, expr: ExprTree):
+		self._expr = expr
+
+	def __iter__(self):
+		yield NegativeSign()
+		yield self._expr.__iter__()
+
+	def postfix(self):
+		yield self._expr.__iter__()
+		yield NegativeSign()
+
+	def evaluate(self, variables):
+		return -self._expr.evaluate()
+
+	def __str__(self):
+		return '( -%s )' % self._expr.__str__()
 
 
 if __name__ == '__main__':

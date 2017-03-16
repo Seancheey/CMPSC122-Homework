@@ -1,6 +1,26 @@
 # author Qiyi Shan
 # date created 1.19.2017
-# date modified 3.15.2017
+# date modified 3.16.2017
+
+from abc import ABCMeta
+
+
+class Neg_meta(ABCMeta):
+	def __repr__(self):
+		return '-'
+
+	def __len__(self):
+		return 1
+
+	def __iter__(self):
+		yield NegativeSign
+
+	def split(cls, sep=None, maxsplit=-1):
+		return NegativeSign
+
+
+class NegativeSign(metaclass=Neg_meta):
+	pass
 
 
 def new_split_iter(expr):
@@ -11,38 +31,36 @@ def new_split_iter(expr):
 	while expr[pos] != ";":  # repeat until the end of the input is found
 		token = expr[pos]
 		out = ""
-		if neg_sign_possible and token == '-' and expr[pos + 1].isnumeric():
-			out = get_number(expr, pos)
+		if neg_sign_possible and token == '-':
 			neg_sign_possible = False
+			out = NegativeSign
 		elif token.isalpha():
-			out = get_variable(expr, pos)
 			neg_sign_possible = False
+			out = get_variable(expr, pos)
+		# Handle number
+		elif token.isnumeric():
+			neg_sign_possible = False
+			out = get_number(expr, pos)
 		elif token in "+-**/(<>!==?:%":
 			neg_sign_possible = True
 			# Handle <= >= != ==
 			if expr[pos + 1] == "=" and token in "<>!=":
 				out = token + expr[pos + 1]
-			# Handle + - / (
-			elif token in "+-/(=?:<>%":
+			# Handle **
+			elif expr[pos:pos + 2] == "**":
+				out = "**"
+			# Handle other operators
+			elif token in "+-/(=?:<>%*":
 				out = token
-			# Handle * and **
-			elif token == "*":
-				if expr[pos + 1] == "*":
-					out = "**"
-				else:
-					out = "*"
-		else:
-			# Handle )
-			if token == ")":
-				out = ")"
-			# Handle number
-			elif token.isnumeric():
-				neg_sign_possible = False
-				out = get_number(expr, pos)
-			# Handle other characters like blank space
 			else:
-				pos += 1
-				continue
+				raise ValueError(token + " is not correct")
+		elif token == ")":
+			neg_sign_possible = False
+			out = ")"
+		# Handle other characters like blank space
+		else:
+			pos += 1
+			continue
 		pos += len(out)
 		yield out
 
@@ -77,8 +95,10 @@ def get_number(expr, pos):
 
 
 if __name__ == "__main__":
+	print(list(new_split_iter("-(5-6)--5")))
+	print(list(new_split_iter("-6*(5-6)")))
 	print(list(new_split_iter("3   !=   2")))
 	print(list(new_split_iter("a + 5-6+beta")))
 	print(list(new_split_iter("1 = 4?33:3334")))
 	print(list(new_split_iter("1 + 0 ? 0 +3 : 5")))
-	print(list(new_split_iter("1+2-3*4/5%6**7=6==5!=4<6>(8<=9>=10?3:10) and 5 or 6")))
+	print(list(new_split_iter("1+2--3*4/5%6**7=6==5!=4<6>(8<=9>=10?3:10) and 5 or 6")))
