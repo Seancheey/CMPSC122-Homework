@@ -175,7 +175,7 @@ class Nega(ExprTree):
 		yield NegativeSign()
 
 	def evaluate(self, variables):
-		return -self._expr.evaluate()
+		return -self._expr.evaluate(variables)
 
 	def __str__(self):
 		return '( -%s )' % self._expr.__str__()
