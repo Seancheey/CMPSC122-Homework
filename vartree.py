@@ -57,10 +57,28 @@ class VarTree:
 		return self._root is None
 
 	def __len__(self):
-		pass
+		def count(cur: self.Node, num):
+			if cur is None:
+				return 0
+			elif cur.left is None and cur.right is None:
+				return 1
+			else:
+				return count(cur.left, num) + count(cur.right, num) + 1
+
+		return count(self._root, 0)
 
 	def __iter__(self):
-		pass
+		def iter_node(cur: self.Node):
+			if cur is None:
+				return
+			for i in iter_node(cur.left):
+				yield i
+			yield cur.key, cur.value
+			for i in iter_node(cur.right):
+				yield i
+
+		for item in iter_node(self._root):
+			yield item
 
 	def _str(self, here):
 		if here is None:
@@ -74,9 +92,12 @@ class VarTree:
 
 if __name__ == "__main__":
 	v = VarTree()
-	v.assign("a", 15)
 	v.assign("b", 20)
+	v.assign("B", 30)
+	v.assign("a", 15)
 	print('a', v.lookup('a'))
 	print('b', v.lookup('b'))
 	print('1', v.lookup('1'))
 	print(v)
+	print(len(v))
+	print(','.join([str(i) + ':' + str(j) for i, j in v]))
