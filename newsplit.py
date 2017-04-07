@@ -95,10 +95,5 @@ def get_number(expr, pos):
 
 
 if __name__ == "__main__":
-	print(list(new_split_iter("-(5-6)--5")))
-	print(list(new_split_iter("-6*(5-6)")))
-	print(list(new_split_iter("3   !=   2")))
-	print(list(new_split_iter("a + 5-6+beta")))
-	print(list(new_split_iter("1 = 4?33:3334")))
-	print(list(new_split_iter("1 + 0 ? 0 +3 : 5")))
 	print(list(new_split_iter("1+2--3*4/5%6**7=6==5!=4<6>(8<=9>=10?3:10) and 5 or 6")))
+	print(list(new_split_iter("deffn gcf(a,b) = (rem = a%b) == 0 ? b : gcf(b,rem)")))

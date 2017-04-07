@@ -181,6 +181,30 @@ class Nega(ExprTree):
 		return '( -%s )' % self._expr.__str__()
 
 
+class Func(ExprTree):
+	"""A Function Operation leaf"""
+	__slots__ = '_name', '_args'
+
+	def __init__(self, name, args: dict):
+		self._name = name
+		self._args = args
+
+	def __iter__(self):
+		yield '('
+		yield '%s(%s)' % (self._name, ','.join(self._args.items()))
+		yield ')'
+
+	def postfix(self):
+		yield '%s(%s)' % (self._name, ','.join(self._args.items()))
+
+	def evaluate(self, variables):
+		expr: ExprTree = variables.lookup(self._name)
+		V = VarTree()
+		for key, val in self._args:
+			V.assign(key, val)
+		return expr.evaluate(V)
+
+
 if __name__ == '__main__':
 	V = VarTree()
 	VA = Var("A")

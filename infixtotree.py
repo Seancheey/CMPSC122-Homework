@@ -25,17 +25,13 @@ def __to_tree(expr):
 			return Var(expr[0])
 
 	for operator in __priority_list:
-		if __to_right_direction[operator]:
-			index_order = range(len(expr) - 1, -1, -1)
-		else:
-			index_order = range(len(expr))
+		index_order = range(len(expr) - 1, -1, -1) if __to_right_direction[operator] else range(len(expr))
 		for i in index_order:
 			if expr[i] in operator.split(' ') and not __in_brackets(expr, i):
 				if expr[i] == '?':
-					for j in range(i + 1, len(expr)):
-						if expr[j] == ':':
-							return Cond(__to_tree(expr[:i]), __to_tree(expr[i + 1:j]), __to_tree(expr[j + 1:]))
-				if expr[i] is NegativeSign:
+					colon_pos = expr.index(':')
+					return Cond(__to_tree(expr[:i]), __to_tree(expr[i + 1:colon_pos]), __to_tree(expr[colon_pos + 1:]))
+				elif expr[i] is NegativeSign:
 					return Nega(__to_tree(expr[i + 1:]))
 				else:
 					return Oper(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
@@ -48,15 +44,7 @@ def __to_tree(expr):
 
 def __in_brackets(expr, pos):
 	"""Test if an operator is included in brackets"""
-	inbracket = False
-	for i in range(len(expr)):
-		if i == pos:
-			return inbracket
-		if expr[i] == '(':
-			inbracket = True
-		elif expr[i] == ')':
-			inbracket = False
-	raise IndexError(str(pos) + " Out of Bound")
+	return expr[:pos].count('(') > expr[:pos].count(')')
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 from Homework.evalpostfix import eval_postfix
 from random import randint
-from Homework.infixtopostfix import to_postfix
+from Homework.infixtoiter import to_postfix
 from Homework.vartree import VarTree
+
+__full_operators = ["+", "-", "*", "/", "%", '**', '>', '<', '>=', '<=', '!=', '==', ' and ', ' or ', '=']
 
 
 class ExprUnitTest:
@@ -9,7 +11,7 @@ class ExprUnitTest:
 	num_range = range(-5, 5)
 	tested_expr = ""
 
-	def __init__(self, operators=["+", "-", "*", "/", '**'], num_range=range(-5, 5)):
+	def __init__(self, operators=["+", "-", "*", "/", "%", '**'], num_range=range(-5, 5)):
 		self.operators = operators
 		self.num_range = num_range
 
@@ -61,7 +63,7 @@ def main():
 	a = ExprUnitTest()
 	for i in range(200):
 		result_correct = a.test(test_eval)
-		print("Correct" if result_correct else "Wrong")
+		print("c" if result_correct else "\nWrong\n", end='')
 		if not result_correct:
 			print(a.tested_expr)
 			print(test_eval(a.tested_expr))
