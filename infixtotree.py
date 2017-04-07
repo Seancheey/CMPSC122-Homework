@@ -36,9 +36,6 @@ def __to_tree(expr):
 		else:
 			return Var(expr[0])
 
-	for pos, val in enumerate(expr[:-1]):
-		if val not in __priority_list and not val.isnumeric() and expr[pos + 1] == '(' and not __in_brackets(expr, pos):
-			return Func(val, __split_args(expr[pos + 2:pos + expr[pos:].index(')')], pos))
 	for operator in __priority_list:
 		index_order = range(len(expr) - 1, -1, -1) if __to_right_direction[operator] else range(len(expr))
 		for i in index_order:
@@ -51,6 +48,9 @@ def __to_tree(expr):
 				else:
 					return Oper(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
 
+	for pos, val in enumerate(expr[:-1]):
+		if val not in __priority_list and not val.isnumeric() and expr[pos + 1] == '(' and not __in_brackets(expr, pos):
+			return Func(val, __split_args(expr[pos + 2:pos + expr[pos:].index(')')], pos))
 	if expr[0] == '(':
 		return __to_tree(expr[1:-1])
 
@@ -64,4 +64,4 @@ def __in_brackets(expr, pos):
 
 if __name__ == "__main__":
 	print(to_expr_tree('func(4,5)'))
-	print(to_expr_tree('func(1*5)'))
+	print(to_expr_tree('func(1*5) + 6'))

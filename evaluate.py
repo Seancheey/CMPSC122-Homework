@@ -30,8 +30,11 @@ def input_mode():
 
 
 if __name__ == '__main__':
+	print(evaluate('v = 4'))
 	evaluate("deffn abs(x) = x>0?x:-x")
 	print(evaluate('-1'))
 	print(evaluate('abs(6)'))
 	print(evaluate('abs(1*5)'))
-	print(evaluate('abs(-9)'))
+	print(evaluate('abs(-9) + 6'))
+	print(evaluate('6*abs(-9)'))
+	input_mode()
