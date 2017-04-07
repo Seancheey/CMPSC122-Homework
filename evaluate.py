@@ -21,10 +21,17 @@ def evaluate(expr):
 		return to_expr_tree(expr).evaluate(__VarTree, __FuncTree)
 
 
+def input_mode():
+	while True:
+		inp = input()
+		if inp is None or inp == '':
+			break
+		print(evaluate(inp))
+
+
 if __name__ == '__main__':
-	print(evaluate('3+5'))
-	print(evaluate('a = 5'))
-	print(evaluate('a==5?1:2'))
-	print(evaluate('1==2'))
-	print(evaluate('deffn funca(x,y) = x*y'))
-	print(evaluate('funca(2,3)'))
+	evaluate("deffn abs(x) = x>0?x:-x")
+	print(evaluate('-1'))
+	print(evaluate('abs(6)'))
+	print(evaluate('abs(1*5)'))
+	print(evaluate('abs(-9)'))

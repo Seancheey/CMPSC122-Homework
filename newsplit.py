@@ -12,6 +12,9 @@ class Neg_meta(ABCMeta):
 	def __len__(self):
 		return 1
 
+	def __getitem__(self, item):
+		return '-'.__getitem__(item)
+
 	def __iter__(self):
 		yield NegativeSign
 
@@ -41,7 +44,7 @@ def new_split_iter(expr):
 		elif token.isnumeric():
 			neg_sign_possible = False
 			out = get_number(expr, pos)
-		elif token in "+-**/(<>!==?:%":
+		elif token in "+-**/(<>!==?:%,":
 			neg_sign_possible = True
 			# Handle <= >= != ==
 			if expr[pos + 1] == "=" and token in "<>!=":
@@ -50,7 +53,7 @@ def new_split_iter(expr):
 			elif expr[pos:pos + 2] == "**":
 				out = "**"
 			# Handle other operators
-			elif token in "+-/(=?:<>%*":
+			elif token in "+-/(=?:<>%*,":
 				out = token
 			else:
 				raise ValueError(token + " is not correct")

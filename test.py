@@ -1,2 +1,3 @@
-for i, j in enumerate(range(10, 15)):
-	print(i, j)
+a = range(50)
+
+print(list(filter(lambda x: x % 2 == 0, a)))
