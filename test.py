@@ -1,6 +1,2 @@
-def sayhi():
-	print('hello')
-	return 111
-	print('111')
-
-print(sayhi())
+for i, j in enumerate(range(10, 15)):
+	print(i, j)

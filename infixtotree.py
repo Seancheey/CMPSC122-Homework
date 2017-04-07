@@ -1,7 +1,7 @@
 # author Qiyi Shan
 # Date 3.16.2017
 
-from Homework.exprtree import Var, Cond, Oper, Value, Nega
+from Homework.exprtree import Var, Cond, Oper, Value, Nega, Func
 from Homework.newsplit import new_split_iter, NegativeSign
 
 __priority_list = ['=', 'and', 'or', '?', '< > <= >= == !=', '+ -', '* / %', NegativeSign, '**']
@@ -29,12 +29,16 @@ def __to_tree(expr):
 		for i in index_order:
 			if expr[i] in operator.split(' ') and not __in_brackets(expr, i):
 				if expr[i] == '?':
-					colon_pos = expr.index(':')
+					colon_pos = i + expr[i:].index(':')
 					return Cond(__to_tree(expr[:i]), __to_tree(expr[i + 1:colon_pos]), __to_tree(expr[colon_pos + 1:]))
 				elif expr[i] is NegativeSign:
 					return Nega(__to_tree(expr[i + 1:]))
 				else:
 					return Oper(__to_tree(expr[:i]), expr[i], __to_tree(expr[i + 1:]))
+
+	for pos, val in enumerate(expr[:-1]):
+		if val not in __priority_list and not val.isnumeric() and expr[pos + 1] == '(' and not __in_brackets(expr, pos):
+			return Func(val, [__to_tree(e) for e in expr[pos + 2:pos + expr[pos:].index(')')]])
 
 	if expr[0] == '(':
 		return __to_tree(expr[1:-1])
@@ -48,11 +52,4 @@ def __in_brackets(expr, pos):
 
 
 if __name__ == "__main__":
-	print(to_expr_tree("5"))
-	print(to_expr_tree('-5**9'))
-	print(to_expr_tree("A = 5"))
-	print(to_expr_tree("A = 2 + 3 * B - xyz"))
-	print(to_expr_tree("x < 0 ? 0 - x : x"))
-	print(to_expr_tree("3* (5+4 /3) + 6"))
-	print(to_expr_tree('1 and 1'))
-	print(to_expr_tree('3 == 4'))
+	print(to_expr_tree('func(4,5)'))

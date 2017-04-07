@@ -2,7 +2,7 @@
 # date 3.16.2017
 
 from abc import ABCMeta, abstractmethod
-from Homework.vartree import VarTree
+from Homework.vartree import VarTree, FuncBody
 from Homework.newsplit import NegativeSign
 
 
@@ -24,7 +24,7 @@ class ExprTree(metaclass=ABCMeta):
 		pass
 
 	@abstractmethod
-	def evaluate(self, variables):
+	def evaluate(self, variables, functions):
 		"""evaluate using the existing variables"""
 		pass
 
@@ -42,7 +42,7 @@ class Var(ExprTree):
 	def postfix(self):
 		yield self._name
 
-	def evaluate(self, variables: VarTree):
+	def evaluate(self, variables: VarTree, functions: VarTree):
 		return variables.lookup(self._name)
 
 
@@ -61,7 +61,7 @@ class Value(ExprTree):
 	def postfix(self):
 		yield self._value
 
-	def evaluate(self, variables):
+	def evaluate(self, variables, functions: VarTree):
 		return self._value
 
 
@@ -82,16 +82,14 @@ class Oper(ExprTree):
 		yield ')'
 
 	def postfix(self):
-		for item in self._value1.postfix():
-			yield item
-		for item in self._value2.postfix():
-			yield item
+		yield from self._value1.postfix()
+		yield from self._value2.postfix()
 		yield self._operator
 
-	def evaluate(self, variables):
+	def evaluate(self, variables, functions: VarTree):
 		o = self._operator
-		v1 = self._value1.evaluate(variables)
-		v2 = self._value2.evaluate(variables)
+		v1 = self._value1.evaluate(variables, functions)
+		v2 = self._value2.evaluate(variables, functions)
 		if o == '+':
 			return v1 + v2
 		elif o == '-':
@@ -152,11 +150,11 @@ class Cond(ExprTree):
 		yield self._expr
 		yield '?'
 
-	def evaluate(self, variables):
-		if self._expr.evaluate(variables):
-			return self._true.evaluate(variables)
+	def evaluate(self, variables, functions: VarTree):
+		if self._expr.evaluate(variables, functions):
+			return self._true.evaluate(variables, functions)
 		else:
-			return self._false.evaluate(variables)
+			return self._false.evaluate(variables, functions)
 
 
 class Nega(ExprTree):
@@ -174,7 +172,7 @@ class Nega(ExprTree):
 		yield self._expr.__iter__()
 		yield NegativeSign()
 
-	def evaluate(self, variables):
+	def evaluate(self, variables, functions: VarTree):
 		return -self._expr.evaluate(variables)
 
 	def __str__(self):
@@ -185,39 +183,21 @@ class Func(ExprTree):
 	"""A Function Operation leaf"""
 	__slots__ = '_name', '_args'
 
-	def __init__(self, name, args: dict):
+	def __init__(self, name, args: list):
 		self._name = name
 		self._args = args
 
 	def __iter__(self):
 		yield '('
-		yield '%s(%s)' % (self._name, ','.join(self._args.items()))
+		yield '%s(%s)' % (self._name, ','.join([str(x) for x in self._args]))
 		yield ')'
 
 	def postfix(self):
-		yield '%s(%s)' % (self._name, ','.join(self._args.items()))
+		yield '%s(%s)' % (self._name, ','.join(self._args.__iter__()))
 
-	def evaluate(self, variables):
-		expr: ExprTree = variables.lookup(self._name)
-		V = VarTree()
-		for key, val in self._args:
-			V.assign(key, val)
-		return expr.evaluate(V)
-
-
-if __name__ == '__main__':
-	V = VarTree()
-	VA = Var("A")
-	Sum = Oper(Value(2), '+', Value(3))
-	A = Oper(VA, '=', Sum)
-	print("Infix iteration: ", list(A))
-	print("String version ", A)
-	print("Postfix iteration: ", list(A.postfix()))
-	print("Execution: ", A.evaluate(V))
-	print("Afterwards, A = ", VA.evaluate(V))
-	print('Logic 0 and 6: ', Oper(Value(0), 'and', Value(6)).evaluate(V))
-	print('Logic 0 or 6: ', Oper(Value(0), 'or', Value(6)).evaluate(V))
-
-	# If A == 5, return A+2 else return 3
-	CondTest = Cond(Oper(VA, '==', Value(5)), Oper(VA, '+', Value(2)), Value(3))
-	print(CondTest, '-->', CondTest.evaluate(V))
+	def evaluate(self, variables, functions: VarTree):
+		body: FuncBody = functions.lookup(self._name)
+		params = VarTree()
+		for i, key in enumerate(body.args):
+			params.assign(key, self._args[i].evaluate(variables, functions))
+		return body.expr.evaluate(params, functions)
