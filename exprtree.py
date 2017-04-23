@@ -1,9 +1,9 @@
 # author Qiyi Shan
 # date 3.16.2017
 
-from abc import ABCMeta, abstractmethod
-from Homework.vartree import VarTree, FuncBody
+from Homework.vartree import *
 from Homework.newsplit import NegativeSign
+from Homework.machine import *
 
 
 class ExprTree(metaclass=ABCMeta):
@@ -28,10 +28,19 @@ class ExprTree(metaclass=ABCMeta):
 		"""evaluate using the existing variables"""
 		pass
 
+	@abstractmethod
+	def comp(self, variables: VarTree, program):
+		"""choose the appropriate machine instructions and place them into the program code"""
+		pass
+
 
 class Var(ExprTree):
 	"""A variable leaf"""
 	__slots__ = '_name'
+
+	@property
+	def name(self):
+		return self._name
 
 	def __init__(self, n):
 		self._name = n
@@ -44,6 +53,9 @@ class Var(ExprTree):
 
 	def evaluate(self, variables: VarTree, functions: VarTree):
 		return variables.lookup(self._name)
+
+	def comp(self, variables: VarTree, program):
+		program.code.append(Store(program.next_reg(), variables.lookup_node(self._name).position))
 
 
 class Value(ExprTree):
@@ -63,6 +75,9 @@ class Value(ExprTree):
 
 	def evaluate(self, variables, functions: VarTree):
 		return self._value
+
+	def comp(self, variables: VarTree, program):
+		program.code.append(Init(program.next_reg(), self._value))
 
 
 class Oper(ExprTree):
@@ -87,42 +102,28 @@ class Oper(ExprTree):
 		yield self._operator
 
 	def evaluate(self, variables, functions: VarTree):
-		o = self._operator
 		v1 = self._value1.evaluate(variables, functions)
 		v2 = self._value2.evaluate(variables, functions)
-		if o == '+':
-			return v1 + v2
-		elif o == '-':
-			return v1 - v2
-		elif o == '*':
-			return v1 * v2
-		elif o == '/':
-			return v1 / v2
-		elif o == '%':
-			return v1 % v2
-		elif o == '**':
-			return v1 ** v2
-		elif o == '=':
-			variables.assign(key=self._value1._name, value=v2)
-			return v2
-		elif o == '>':
-			return v1 > v2
-		elif o == '<':
-			return v1 < v2
-		elif o == '>=':
-			return v1 >= v2
-		elif o == '<=':
-			return v1 <= v2
-		elif o == '==':
-			return v1 == v2
-		elif o == '!=':
-			return v1 != v2
-		elif o == 'and':
-			return bool(v1) and bool(v2)
-		elif o == 'or':
-			return bool(v1) or bool(v2)
+		if self._operator == '=':
+			if type(self._value1) == Var:
+				variables.assign(key=self._value1.name, value=v2)
+				return v2
+			else:
+				raise NotImplementedError("Can't assign value to an non-variable object")
 		else:
-			raise NotImplementedError(str(o) + " operation is not implemented")
+			return eval("%s %s %s" % (v1, self._operator, v2))
+
+	def comp(self, variables: VarTree, program):
+		if self._operator == "=":
+			self._value2.comp(variables, program)
+			variables.assign(key=self._value1.name, value=Reference(program.last_temp), pos=len(variables))
+			program.code.append(Store(program.last_temp, len(variables)))
+		else:
+			self._value1.comp(variables, program)
+			pos1 = program.last_temp
+			self._value2.comp(variables, program)
+			pos2 = program.last_temp
+			program.code.append(Comp(program.next_reg(), pos1, self._operator, pos2))
 
 
 class Cond(ExprTree):

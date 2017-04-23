@@ -3,11 +3,14 @@
 
 from Homework.exprtree import Var, Cond, Oper, Value, Nega, Func
 from Homework.newsplit import new_split_iter, NegativeSign
-from functools import reduce
 
 __priority_list = ['=', 'and', 'or', '?', '< > <= >= == !=', '+ -', '* / %', NegativeSign, '**']
 __to_right_direction = {'=': False, 'and': True, 'or': True, '?': False, '< > <= >= == !=': True, '+ -': True,
 						'* / %': True, NegativeSign: True, '**': False}
+
+
+def tree_assign(iterator):
+	return to_expr_tree(iterator)
 
 
 def to_expr_tree(expr):
