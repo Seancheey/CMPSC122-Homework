@@ -55,7 +55,7 @@ class Var(ExprTree):
 		return variables.lookup(self._name)
 
 	def comp(self, variables: VarTree, program):
-		program.code.append(Store(program.next_reg(), variables.lookup_node(self._name).position))
+		program.code.append(Load(program.next_reg(), variables.lookup_node(self._name).position))
 
 
 class Value(ExprTree):
@@ -117,7 +117,7 @@ class Oper(ExprTree):
 		if self._operator == "=":
 			self._value2.comp(variables, program)
 			variables.assign(key=self._value1.name, value=Reference(program.last_temp), pos=len(variables))
-			program.code.append(Store(program.last_temp, len(variables)))
+			program.code.append(Store(program.last_temp, len(variables) - 1))
 		else:
 			self._value1.comp(variables, program)
 			pos1 = program.last_temp
