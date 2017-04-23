@@ -1,40 +1,44 @@
+from Homework.vartree import VarTree
+from Homework.peekable import Peekable, peek
 from Homework.newsplit import new_split_iter
-from Homework.infixtotree import to_expr_tree
-from Homework.vartree import VarTree, FuncBody
+from Homework.infixtotree import tree_assign
 
-__VarTree = VarTree()
-__FuncTree = VarTree()
-DEF_KEY = 'deffn'
+
+def define_func(iterator):
+	""" Define a new function, which should appear as
+		deffn <function name> ( <parameters> ) = <function body>
+		a VarTree will associate the function name with
+		a list of parameters (at least one, maybe more)
+		and a tree representing the function body
+	"""
+	next(iterator)  # "deffn"
+	name = next(iterator)  # function name
+	next(iterator)  # (
+	parms = [next(iterator)]  # first argument
+	while next(iterator) == ',':
+		parms.append(next(iterator))
+	next(iterator)  # =
+	return name, parms, tree_assign(iterator)
 
 
 def evaluate(expr):
-	"""evaluate expression or definition"""
-	# deffn square(x,y) = x*y
-	if type(expr) is str:
-		expr = list(new_split_iter(expr))
-	if expr[0] == DEF_KEY:
-		func_name = expr[1]
-		func_args = expr[expr.index('(') + 1:expr.index(')')]
-		func_body = expr[expr.index('=') + 1:]
-		__FuncTree.assign(func_name, FuncBody(func_args, to_expr_tree(func_body)))
+	"""Define a new function, or evaluate an expression
+	   The decision is based on the first token in the input line
+	"""
+	iterator = Peekable(new_split_iter(expr))
+	if peek(iterator) == "deffn":
+		name, parms, body = define_func(iterator)
+		functions.assign(name, (parms, body))
 	else:
-		return to_expr_tree(expr).evaluate(__VarTree, __FuncTree)
+		print(expr, ':', tree_assign(iterator).evaluate(variables, functions))
 
 
-def input_mode():
-	while True:
-		inp = input()
-		if inp is None or inp == '':
-			break
-		print(evaluate(inp))
-
-
-if __name__ == '__main__':
-	print(evaluate('v = 4'))
-	evaluate("deffn abs(x) = x>0?x:-x")
-	print(evaluate('-1'))
-	print(evaluate('abs(6)'))
-	print(evaluate('abs(1*5)'))
-	print(evaluate('abs(-9) + 6'))
-	print(evaluate('6*abs(-9)'))
-	input_mode()
+functions = VarTree()
+variables = VarTree()
+if __name__ == "__main__":
+	evaluate("deffn sqr(x) = x*x")
+	evaluate("deffn abs(x) = x > 0 ? x : 0-x")
+	evaluate("deffn fact(n) = n <= 1 ? 1 : n * fact(n-1)")
+	evaluate("sqr(4)")
+	evaluate("abs(3-5)")
+	evaluate("fact(5)")
